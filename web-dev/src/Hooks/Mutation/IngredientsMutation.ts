@@ -1,20 +1,22 @@
 import { useMutation, UseMutationResult, useQueryClient } from "react-query";
 import axios from "../../Utils/axios";
 import { Requests } from "../QueriesAndMutationList";
+import { Ingredient } from "../../Types/Ingredient";
 
 export const useMutationIngredientCreate = (): UseMutationResult<
-  any,
+  Ingredient,
   unknown,
-  { name: string; price: number }
+  Omit<Ingredient, "id">
 > => {
   const clientQuery = useQueryClient();
 
   return useMutation(
     [Requests.createIngredient],
-    async ({ name, price }: { name: string; price: number }) => {
+    async ({ name, price, category }: Omit<Ingredient, "id">) => {
       return await axios.post(`/ingredient/create`, {
         name,
         price,
+        category,
       });
     },
     {

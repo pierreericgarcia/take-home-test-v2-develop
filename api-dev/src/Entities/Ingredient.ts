@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { IngredientCategory } from "../types";
 
 @Entity()
 export class Ingredient {
@@ -10,4 +11,10 @@ export class Ingredient {
 
   @Column()
   price: number;
+
+  @Column({
+    type: "enum",
+    enum: IngredientCategory,
+  })
+  category: IngredientCategory;
 }

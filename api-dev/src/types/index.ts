@@ -1,4 +1,11 @@
-import { Ingredient } from "./Ingredient";
+import { Ingredient } from "../Entities/Ingredient";
+import { Recipe } from "../Entities/Recipe";
+
+export enum IngredientCategory {
+  VEGETABLE = "vegetable",
+  PROTEIN = "protein",
+  STARCH = "starch",
+}
 
 export enum RecipeValidationError {
   TOO_MANY_PROTEINS = "too_many_proteins",
@@ -12,11 +19,6 @@ export interface RecipeValidation {
   errors: RecipeValidationError[];
 }
 
-export interface Recipe {
-  id: number;
-  name: string;
-  numberOfPeople: number;
-  timeToCook: number;
-  ingredients: Ingredient[];
+export type ValidatedRecipe = Omit<Recipe, "validate"> & {
   validation: RecipeValidation;
-}
+};

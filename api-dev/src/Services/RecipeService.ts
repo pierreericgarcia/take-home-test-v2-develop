@@ -1,13 +1,44 @@
 import { getRepository, In } from "typeorm";
 import { Ingredient } from "../Entities/Ingredient";
 import { Recipe } from "../Entities/Recipe";
+import {
+  IngredientCategory,
+  RecipeValidationError,
+  ValidatedRecipe,
+} from "../types";
 
 export class RecipeService {
-  static async list(): Promise<Recipe[]> {
+  static async list(): Promise<ValidatedRecipe[]> {
     const recipes = await getRepository(Recipe).find({
       relations: ["ingredients"],
     });
-    return recipes;
+
+    const validatedRecipes = recipes.map((recipe) => {
+      const validation = recipe.validate();
+      const protein = recipe.ingredients.find(
+        (i) => i.category === IngredientCategory.PROTEIN
+      );
+      const proteinAlreadyUsed = recipes.some((comparedRecipe) => {
+        const comparedProtein = comparedRecipe.ingredients.find(
+          (i) => i.category === IngredientCategory.PROTEIN
+        );
+        return (
+          comparedRecipe.id !== recipe.id && comparedProtein?.id === protein?.id
+        );
+      });
+
+      return {
+        ...recipe,
+        validation: {
+          isValid: !proteinAlreadyUsed && validation.isValid,
+          errors: proteinAlreadyUsed
+            ? [...validation.errors, RecipeValidationError.PROTEIN_ALREADY_USED]
+            : validation.errors,
+        },
+      };
+    });
+
+    return validatedRecipes;
   }
 
   static async create(recipe: Recipe): Promise<Recipe> {

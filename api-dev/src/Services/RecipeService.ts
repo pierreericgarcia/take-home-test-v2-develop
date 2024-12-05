@@ -9,6 +9,25 @@ import {
 } from "../types";
 
 export class RecipeService {
+  static async validateFromDTO(recipeDTO: {
+    name: string;
+    timeToCook: number;
+    numberOfPeople: number;
+    ingredients: number[];
+  }): Promise<RecipeValidation> {
+    const recipe = new Recipe();
+    recipe.name = recipeDTO.name;
+    recipe.timeToCook = recipeDTO.timeToCook;
+    recipe.numberOfPeople = recipeDTO.numberOfPeople;
+
+    const ingredients = await getRepository(Ingredient).findByIds(
+      recipeDTO.ingredients
+    );
+    recipe.ingredients = ingredients;
+
+    return this.validate(recipe);
+  }
+
   static async validate(recipe: Recipe): Promise<RecipeValidation> {
     const recipes = await getRepository(Recipe).find({
       relations: ["ingredients"],

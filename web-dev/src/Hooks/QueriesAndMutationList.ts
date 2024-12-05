@@ -16,6 +16,7 @@ export enum Requests {
   createRecipe = "createRecipeMutation",
   updateRecipe = "updateRecipeMutation",
   deleteRecipe = "deleteRecipeMutation",
+  validateRecipe = "validateRecipeMutation",
 
   // SHOPPING LIST
 

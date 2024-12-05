@@ -1,6 +1,7 @@
 import { useMutation, UseMutationResult, useQueryClient } from "react-query";
 import axios from "../../Utils/axios";
 import { Requests } from "../QueriesAndMutationList";
+import { Recipe, RecipeValidation } from "../../Types/Recipe";
 
 interface RecipeCreateType {
   name: string;
@@ -9,7 +10,7 @@ interface RecipeCreateType {
   ingredients: number[];
 }
 export const useMutationRecipeCreate = (): UseMutationResult<
-  any,
+  Recipe,
   unknown,
   RecipeCreateType
 > => {
@@ -34,6 +35,30 @@ export const useMutationRecipeCreate = (): UseMutationResult<
       onSuccess: () => {
         clientQuery.invalidateQueries(Requests.listRecipe);
       },
+    }
+  );
+};
+
+export const useMutationRecipeValidate = (): UseMutationResult<
+  RecipeValidation,
+  unknown,
+  RecipeCreateType
+> => {
+  return useMutation(
+    [Requests.validateRecipe],
+    async ({
+      name,
+      timeToCook,
+      numberOfPeople,
+      ingredients,
+    }: RecipeCreateType) => {
+      const { data } = await axios.post<RecipeValidation>("/recipe/validate", {
+        name,
+        timeToCook,
+        numberOfPeople,
+        ingredients,
+      });
+      return data;
     }
   );
 };

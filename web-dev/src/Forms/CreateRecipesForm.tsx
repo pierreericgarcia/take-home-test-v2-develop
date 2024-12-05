@@ -8,11 +8,15 @@ import {
 import { useState } from "react";
 import { CardCustom } from "../Components/CardCustom";
 import { Loader } from "../Components/Loader";
-import { useMutationRecipeCreate } from "../Hooks/Mutation/RecipeMutation";
+import {
+  useMutationRecipeCreate,
+  useMutationRecipeValidate,
+} from "../Hooks/Mutation/RecipeMutation";
 import { useQueryIngredientList } from "../Hooks/Query/IngredientQuery";
 import { ErrorPage } from "../Pages/ErrorPage";
 import { Ingredient } from "../Types/Ingredient";
 import { OptionsMultiSelectType } from "../Types/OptionsMultiSelect";
+import { recipeValidationErrorLabels } from "../Utils/enumLabels";
 
 export function CreateRecipesForm(): JSX.Element {
   const [name, setName] = useState("");
@@ -22,6 +26,7 @@ export function CreateRecipesForm(): JSX.Element {
     OptionsMultiSelectType[]
   >([]);
   const { mutateAsync: createRecipe } = useMutationRecipeCreate();
+  const { mutateAsync: validateRecipe } = useMutationRecipeValidate();
   const { data: ingredients, status, isLoading } = useQueryIngredientList();
 
   const resetFields = () => {
@@ -32,6 +37,20 @@ export function CreateRecipesForm(): JSX.Element {
   };
 
   const handlerSubmitNewRecipe = async () => {
+    const validation = await validateRecipe({
+      name,
+      timeToCook,
+      numberOfPeople,
+      ingredients: selectedIngredients.map((e) => e.id),
+    });
+
+    if (!validation.isValid) {
+      alert(
+        validation.errors.map((e) => recipeValidationErrorLabels[e]).join("\n")
+      );
+      return;
+    }
+
     if (!name || !timeToCook || !numberOfPeople || !selectedIngredients) {
       alert("Please fill all the fields");
       return;

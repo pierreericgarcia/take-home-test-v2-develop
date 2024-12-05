@@ -28,15 +28,19 @@ export class RecipeService {
     return this.validate(recipe);
   }
 
-  static async validate(recipe: Recipe): Promise<RecipeValidation> {
+  static async isProteinAlreadyUsed(recipe: Recipe): Promise<boolean> {
     const recipes = await getRepository(Recipe).find({
       relations: ["ingredients"],
     });
-    const validation = recipe.validate();
     const protein = recipe.ingredients.find(
       (i) => i.category === IngredientCategory.PROTEIN
     );
-    const proteinAlreadyUsed = recipes.some((comparedRecipe) => {
+
+    if (!protein) {
+      return false;
+    }
+
+    return recipes.some((comparedRecipe) => {
       const comparedProtein = comparedRecipe.ingredients.find(
         (i) => i.category === IngredientCategory.PROTEIN
       );
@@ -44,6 +48,12 @@ export class RecipeService {
         comparedRecipe.id !== recipe.id && comparedProtein?.id === protein?.id
       );
     });
+  }
+
+  static async validate(recipe: Recipe): Promise<RecipeValidation> {
+    const validation = recipe.validate();
+
+    const proteinAlreadyUsed = await this.isProteinAlreadyUsed(recipe);
 
     return {
       isValid: !proteinAlreadyUsed && validation.isValid,

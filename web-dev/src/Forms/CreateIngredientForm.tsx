@@ -11,6 +11,7 @@ import { useState } from "react";
 import { CardCustom } from "../Components/CardCustom";
 import { useMutationIngredientCreate } from "../Hooks/Mutation/IngredientsMutation";
 import { IngredientCategory } from "../Types/Ingredient";
+import { ingredientCategoryLabels } from "../Utils/enumLabels";
 
 export function CreateIngredientForm(): JSX.Element {
   const { mutateAsync: createIngredient } = useMutationIngredientCreate();
@@ -77,11 +78,11 @@ export function CreateIngredientForm(): JSX.Element {
               variant="outlined"
               fullWidth
             >
-              <MenuItem value={IngredientCategory.VEGETABLE}>
-                Vegetable
-              </MenuItem>
-              <MenuItem value={IngredientCategory.PROTEIN}>Protein</MenuItem>
-              <MenuItem value={IngredientCategory.STARCH}>Starch</MenuItem>
+              {Object.values(IngredientCategory).map((category) => (
+                <MenuItem value={category}>
+                  {ingredientCategoryLabels[category]}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
           <FormControl fullWidth margin="normal">

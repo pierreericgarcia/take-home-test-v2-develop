@@ -21,6 +21,16 @@ export class RecipeController {
     }
   }
 
+  public static async validate(req: any, res: any): Promise<void> {
+    try {
+      const validation = await RecipeService.validate(req.body);
+      res.json(validation);
+    } catch (err) {
+      console.error("[RecipeController.validate] Error validating recipe", err);
+      res.status(500);
+    }
+  }
+
   public static async update(req: any, res: any, next: any): Promise<void> {
     try {
       const recipe = await RecipeService.update(req.body);

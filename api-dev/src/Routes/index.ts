@@ -10,6 +10,7 @@ const routes = Router();
 const recipeRouter = Router();
 recipeRouter.get("/list", RecipeController.list);
 recipeRouter.post("/create", RecipeController.create);
+recipeRouter.post("/validate", RecipeController.validate);
 recipeRouter.put("/update", RecipeController.update);
 recipeRouter.delete("/delete/:id", RecipeController.delete);
 
